@@ -1,0 +1,11 @@
+  - op: fill_requires
+    module: i2c_shared_bus_stack
+    requires_id: module.driver.comms_i2c_bus.requires.i2c
+    module_id: module.driver.i2c_on_sci_i2c
+    name: i2c_master_stack
+
+  - op: change_property
+    type: instance
+    module_or_thread: i2c_master_stack
+    id: module.driver.i2c.channel
+    value: {{pmod_sensor_i2c.channel[-1]}} 

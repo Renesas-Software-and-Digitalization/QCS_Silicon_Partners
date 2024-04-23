@@ -1,0 +1,9 @@
+source: Partner
+interface: pmod_spi
+type: sensor
+daisychain: false
+compatibility:
+  modules:
+  applications:
+    - arducam_webserver:
+      - freertos

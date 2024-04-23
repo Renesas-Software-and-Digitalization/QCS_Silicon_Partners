@@ -1,0 +1,55 @@
+{% set project_path = 'applications' %}
+{% set module_path = 'modules' %}
+{% set mcu_path = 'mcu_kits' %}
+
+{% set pmod_conn_uart = board.pmod[conn_module.interface][conn_module.interface_type].uart %}
+{% set pmod_conn_irq = board.pmod[conn_module.interface][conn_module.interface_type].irq %}
+{% set pmod_conn_reset = board.pmod[conn_module.interface][conn_module.interface_type].pins.reset %}
+{% set pmod_conn_rts = board.pmod[conn_module.interface][conn_module.interface_type].pins.rts %}
+{% set pmod_conn_cts = board.pmod[conn_module.interface][conn_module.interface_type].pins.cts %}
+{% set pmod_conn_tx = board.pmod[conn_module.interface][conn_module.interface_type].pins.tx %}
+{% set pmod_conn_rx = board.pmod[conn_module.interface][conn_module.interface_type].pins.rx %}
+{% set pmod_conn_rx = board.pmod[conn_module.interface][conn_module.interface_type].pins.int %}
+
+{% set pmod_sensor_i2c = board.pmod[sensor_module.interface][sensor_module.interface_type].i2c %}
+{% set pmod_sensor_irq = board.pmod[sensor_module.interface][sensor_module.interface_type].irq %}
+{% set pmod_sensor_reset = board.pmod[sensor_module.interface][sensor_module.interface_type].pins.reset %}
+{% set pmod_sensor_sda = board.pmod[sensor_module.interface][sensor_module.interface_type].pins.sda %}
+{% set pmod_sensor_scl = board.pmod[sensor_module.interface][sensor_module.interface_type].pins.scl %}
+{% set pmod_sensor_rx = board.pmod[sensor_module.interface][sensor_module.interface_type].pins.int %}
+{% set pmod_sensor_rstport = board.pmod[sensor_module.interface][sensor_module.interface_type].pins.rstport %}
+
+- name: {{project.name}}
+  fsp_version: default
+  board_or_device: {{project.kit}}
+  toolchain: gcc
+  toolchain_version: default
+  rtos: {{project.os}}
+  template: {{project.template}}
+  sequence:
+# specific clock initialization
+{% if mcu_kit == "fpb_ra6e2" %}
+  - op: change_clock
+    id: board.clock.i3cclk.source
+    value: board.clock.i3cclk.source.pll
+
+  - op: change_clock
+    id: board.clock.i3cclk.div
+    value: board.clock.i3cclk.div.2
+{%- endif %} 
+
+{% if mcu_kit == "ek_ra8d1" or  mcu_kit == "ek_ra8m1"%}
+  - op: change_clock
+    id: board.clock.sciclk.source
+    value: board.clock.sciclk.source.pll1p
+
+  - op: change_clock
+    id: board.clock.sciclk.div
+    value: board.clock.sciclk.div.4
+{%- endif %} 
+
+{% include project_path + '/' + app_name + '/' + rtos_name + '/' + app_name + '.yml.j2' %}
+
+
+     
+         

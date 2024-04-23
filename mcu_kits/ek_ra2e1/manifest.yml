@@ -1,0 +1,44 @@
+source: Renesas
+type: mcu_kit
+interfaces:
+  pmod: 
+    pmod1:
+      pmod_i2c: 
+        i2c: 
+          channel: sci0
+          type: sci_i2c
+        irq: irq04
+        pins:
+          sda: p101
+          scl: p100
+          reset: p208        
+          int: p411        
+    pmod2:
+      pmod_uart: 
+        uart: 
+          channel: sci1
+          type: sci_uart
+        irq: irq6
+        pins:
+          tx: p401
+          rx: p402
+          rts: p400 
+          cts: p403             
+          reset: p303                 
+          int: p409        
+compatibility:
+  modules:
+    pmod:
+      pmod1: 
+        pmod_i2c
+        pmod_spi
+      exclude:
+        arducam_mega_cam
+        icm42688
+      pmod2: 
+        pmod_uart
+  applications:
+    aws_mqtt_onchip:
+      freertos
+    custom_profile:
+      baremetal

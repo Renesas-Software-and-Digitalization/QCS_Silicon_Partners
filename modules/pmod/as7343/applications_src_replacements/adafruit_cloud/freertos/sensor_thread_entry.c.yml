@@ -1,0 +1,39 @@
+# src/sensor_thread_entry.c replacements
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@INCLUDES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_DECLARATION'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+          uint16_t as7343_readings[12];
+          g_as7343_quick_setup();
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_LOOP'
+    replace: |
+          g_as7343_sensor0_read(as7343_readings);
+          float data[SENSOR_DATA_COUNT]={(float)as7343_readings[0], (float)as7343_readings[1], (float)as7343_readings[2], (float)as7343_readings[3],
+              (float)as7343_readings[6], (float)as7343_readings[7], (float)as7343_readings[8], (float)as7343_readings[9], (float)as7343_readings[10], (float)as7343_readings[11]};
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |
+

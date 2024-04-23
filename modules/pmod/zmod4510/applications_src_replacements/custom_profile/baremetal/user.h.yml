@@ -1,0 +1,23 @@
+# user.h replacements
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@INCLUDES'
+    replace: |
+      #include "zmod4510_sensor.h"
+      
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@MACROS'
+    replace: |
+      #define SENSOR_DATA_COUNT       ( 1 )
+
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@EXTERN_GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@FN_DECLARATION'
+    replace: |

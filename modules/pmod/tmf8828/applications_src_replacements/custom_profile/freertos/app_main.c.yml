@@ -1,0 +1,53 @@
+# qe_gen\ble\app_main.c replacements
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@INCLUDES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@FN_DECLARATION'
+    replace: |
+          static void handle_read_tof(uint16_t id, uint8_t const * const data);
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+          static const qc_svc_request_handlers_t qc_sv_req_handlers[] =
+          {
+                /* Object ID   Read Handler                  Write Handler */
+                { 0x0000,      handle_read_gui_req,          NULL                        },
+                { 0x0100,      NULL,                         handle_write_led            },
+                { 0x0201,      handle_read_tof,              NULL                        },
+                { 0x0301,      handle_read_version,          NULL                        },
+                { 0xFFFF,      NULL,                         NULL                        }
+          };
+          static float tof;
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@MAIN_LOOP'
+    replace: |
+          float sens_data[SENSOR_DATA_COUNT] = {0};
+          if (pdTRUE == xQueueReceive(g_sensor_queue, &sens_data, 0))
+          {
+            tof = sens_data[0];
+          }
+        
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |
+          static void handle_read_tof(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(tof), (uint8_t *)&tof);
+          }
