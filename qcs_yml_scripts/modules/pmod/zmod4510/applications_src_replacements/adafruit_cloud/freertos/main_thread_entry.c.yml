@@ -1,0 +1,39 @@
+# src/main_thread_entry.c replacements
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@INCLUDES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@FN_DECLARATION'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+            const char *pPubTopics[SENSOR_DATA_COUNT] = {
+                                                            ZMOD_AIQ_TOPIC
+            };
+            
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@MAIN_LOOP'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |
+
+    

@@ -1,0 +1,7 @@
+source: Renesas
+os:
+  - freertos
+requires:
+  - mcu_kit
+  - connectivity
+  - sensor

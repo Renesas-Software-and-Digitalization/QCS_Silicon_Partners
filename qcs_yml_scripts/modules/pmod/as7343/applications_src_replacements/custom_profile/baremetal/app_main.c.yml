@@ -1,0 +1,152 @@
+# qe_gen\ble\app_main.c replacements
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@INCLUDES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@FN_DECLARATION'
+    replace: |
+          static void handle_read_415nm(uint16_t id, uint8_t const * const data);
+          static void handle_read_445nm(uint16_t id, uint8_t const * const data);
+          static void handle_read_480nm(uint16_t id, uint8_t const * const data);
+          static void handle_read_515nm(uint16_t id, uint8_t const * const data);
+          static void handle_read_555nm(uint16_t id, uint8_t const * const data);
+          static void handle_read_590nm(uint16_t id, uint8_t const * const data);
+          static void handle_read_630nm(uint16_t id, uint8_t const * const data);
+          static void handle_read_680nm(uint16_t id, uint8_t const * const data);
+          static void handle_read_clear(uint16_t id, uint8_t const * const data);
+          static void handle_read_nir(uint16_t id, uint8_t const * const data);
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+          static const qc_svc_request_handlers_t qc_sv_req_handlers[] =
+          {
+                /* Object ID   Read Handler                  Write Handler */
+                { 0x0000,      handle_read_gui_req,          NULL                 },
+                { 0x0100,      NULL,                         handle_write_led     },
+                { 0x0201,      handle_read_415nm,            NULL                 },
+                { 0x0202,      handle_read_445nm,            NULL                 },
+                { 0x0203,      handle_read_480nm,            NULL                 },
+                { 0x0204,      handle_read_515nm,            NULL                 },
+                { 0x0205,      handle_read_555nm,            NULL                 },
+                { 0x0206,      handle_read_590nm,            NULL                 },
+                { 0x0207,      handle_read_630nm,            NULL                 },
+                { 0x0208,      handle_read_680nm,            NULL                 },
+                { 0x0209,      handle_read_clear,            NULL                 },
+                { 0x0210,      handle_read_nir,              NULL                 },
+                { 0x0301,      handle_read_version,          NULL                 },
+                { 0xFFFF,      NULL,                         NULL                 }
+          };
+          static float wave_415nm;
+          static float wave_445nm;
+          static float wave_480nm;
+          static float wave_515nm;
+          static float wave_555nm;
+          static float wave_590nm;
+          static float wave_630nm;
+          static float wave_680nm;
+          static float clear;
+          static float nir;
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+          uint16_t as7343_readings[12];
+          g_as7343_quick_setup();
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@MAIN_LOOP'
+    replace: |
+          if (g_as7343_sensor0_read(as7343_readings))
+          {
+          wave_415nm = (float)as7343_readings[0];
+          wave_445nm = (float)as7343_readings[1];
+          wave_480nm = (float)as7343_readings[2];
+          wave_515nm = (float)as7343_readings[3];
+          wave_555nm = (float)as7343_readings[6];
+          wave_590nm = (float)as7343_readings[7];
+          wave_630nm = (float)as7343_readings[8];
+          wave_680nm = (float)as7343_readings[9];
+          clear      = (float)as7343_readings[10];
+          nir        = (float)as7343_readings[11];
+          }
+
+  - op: replace_in_file
+    src: 'src/qe_gen/ble/app_main.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |
+          static void handle_read_415nm(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(wave_415nm), (uint8_t *)&wave_415nm);
+          }
+
+          static void handle_read_445nm(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(wave_445nm), (uint8_t *)&wave_445nm);
+          }
+
+          static void handle_read_480nm(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(wave_480nm), (uint8_t *)&wave_480nm);
+          }
+
+          static void handle_read_515nm(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(wave_515nm), (uint8_t *)&wave_515nm);
+          }
+
+          static void handle_read_555nm(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(wave_555nm), (uint8_t *)&wave_555nm);
+          }
+
+          static void handle_read_590nm(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(wave_590nm), (uint8_t *)&wave_590nm);
+          }
+
+          static void handle_read_630nm(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(wave_630nm), (uint8_t *)&wave_630nm);
+          }
+
+          static void handle_read_680nm(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(wave_680nm), (uint8_t *)&wave_680nm);
+          }
+          static void handle_read_clear(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(clear), (uint8_t *)&clear);
+          }
+
+          static void handle_read_nir(uint16_t id, uint8_t const * const data)
+          {
+              FSP_PARAMETER_NOT_USED(data);
+              printf("sending id: 0x%04x\n", id);
+              qc_svc_send_read_response(QC_SVC_SUCCESS, id, sizeof(nir), (uint8_t *)&nir);
+          }

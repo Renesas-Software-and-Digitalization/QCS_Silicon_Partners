@@ -1,0 +1,8 @@
+source: Renesas
+os:
+  - baremetal
+  - freertos
+requires:
+  - mcu_kit
+  - connectivity
+  - sensor

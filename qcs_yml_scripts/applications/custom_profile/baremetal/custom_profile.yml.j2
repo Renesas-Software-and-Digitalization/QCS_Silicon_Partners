@@ -1,0 +1,187 @@
+
+  - op: get_hal
+    name: t0
+  {% set conn_thread = 't0' %}
+  {% set sensor_thread = 't0' %}
+
+{% if mcu_kit == "fpb_ra0e1"%}
+  - op: add
+    id: module.driver.timer_on_tau
+    thread: t0
+    name: led_timer
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.channel
+    value: 1
+    name: led_timer_channel
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.name
+    value: g_led_timer
+    name: timer_name
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.period
+    value: 500
+    name: timer_period
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.operation_clock
+    value: module.driver.timer.operation_clock.CK03
+    name: timer_clock
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.unit
+    value: module.driver.timer.unit.unit_period_msec
+    name: timer_unit
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.p_callback
+    value: led_timer_cb
+    name: timer_callback
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.ipl
+    value: board.icu.common.irq.priority3
+    name: timer_interrupt_priority
+{%- else %}
+  - op: add
+    id: module.driver.timer_on_gpt
+    thread: {{conn_thread}}
+    name: led_timer
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.name
+    value: g_led_timer
+    name: timer_name
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.channel
+    value: 1
+    name: led_timer_channel
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.period
+    value: 500
+    name: timer_period
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.unit
+    value: module.driver.timer.unit.unit_period_msec
+    name: timer_unit
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.p_callback
+    value: led_timer_cb
+    name: timer_callback
+  - op: change_property
+    module_or_thread: led_timer
+    type: instance
+    id: module.driver.timer.ipl
+    value: board.icu.common.irq.priority3
+    name: timer_interrupt_priority
+{%- endif %} 
+
+# Jump to the module template   
+{% include module_path + '/' + 'pmod' + '/' + conn_module.name + '/' + conn_module.name + '.yml.j2' %}
+
+{% include module_path + '/' + 'pmod' + '/' + sensor_module.name + '/' + sensor_module.name + '.yml.j2' +%}
+  - op: change_property
+    module_or_thread: bsp
+    type: common
+    id: config.bsp.common.heap
+    value: 0x800
+    name: bsp_heap_alloc
+
+  - op: change_property
+    module_or_thread: bsp
+    type: common
+    id: config.bsp.common.main
+    value: 0x800
+    name: bsp_stack_alloc
+
+  - op: add_file
+    src: applications/custom_profile/{{rtos_name}}/src/hal_entry.c 
+    dst: src/hal_entry.c
+  - op: add_file
+    src: applications/custom_profile/{{rtos_name}}/src/gui_cfg.h  
+    dst: src/gui_cfg.h
+  - op: add_file
+    src: applications/custom_profile/{{rtos_name}}/src/qc_svc.c
+    dst: src/qc_svc.c
+  - op: add_file
+    src: applications/custom_profile/{{rtos_name}}/src/qc_svc.h
+    dst: src/qc_svc.h
+  - op: add_folder
+    src: applications/custom_profile/{{rtos_name}}/src/qe_gen
+    dst: src/qe_gen
+
+  # Add Files for Segger RTT
+  - op: add_file
+    src: applications/common_files/console/RTT/rtt_stout.c
+    dst: src/rtt_stout.c
+  - op: add_folder
+    src: applications/common_files/console/RTT/SEGGER_RTT
+    dst: src/SEGGER_RTT
+
+  # Add Files for common files
+  - op: add_file
+    src: applications/common_files/misc/user.h
+    dst: src/user.h      
+  - op: add_file
+    src: applications/common_files/misc/{{rtos_name}}/common_utils.h      
+    dst: src/common_utils.h    
+  - op: add_file
+    src: applications/common_files/misc/{{rtos_name}}/common_utils.c      
+    dst: src/common_utils.c   
+
+  # Documentation
+  - op: add_file
+    src: applications/{{app_name}}/Documentation/README.md
+    dst: README.md
+
+  - op: generate      
+
+  - op: replace_in_file
+    src: ra/fsp/src/rm_ble_abs_gtl/r_ble_gtl_api.c
+    match: |
+        #include "qe_ble_profile.h"
+    replace: |        
+        #include "qe_gen/ble/qe_ble_profile.h"
+  - op: replace_in_file
+    src: ra/renesas/wireless/da14xxx/r_ble_gtl/r_ble_gtl.c
+    match: |
+        #include "qe_ble_profile.h"
+    replace: |        
+        #include "qe_gen/ble/qe_ble_profile.h"
+
+  - op: replace_in_file
+    src: src/qe_gen/ble/profile_cmn/r_ble_servc_if.c
+    match: |
+        #include "discovery/r_ble_disc.h"
+    replace: |        
+        #include "qe_gen/ble/discovery/r_ble_disc.h"
+
+#Add module replacements
+
+{% include module_path + '/' + 'pmod' + '/' + sensor_module.name  + '/' + 'applications_src_replacements/' + app_name + '/' + rtos_name + '/' + 'user.h.yml' %}
+
+{% include module_path + '/' + 'pmod' + '/' + sensor_module.name  + '/' + 'applications_src_replacements/' + app_name + '/' + rtos_name + '/' + 'app_main.c.yml' %}
+
+{% include module_path + '/' + 'pmod' + '/' + sensor_module.name  + '/' + 'applications_src_replacements/' + app_name + '/' + rtos_name + '/' + 'gui_cfg.h.yml' %}
+
+  - op: build
+    completed: 1  
+    

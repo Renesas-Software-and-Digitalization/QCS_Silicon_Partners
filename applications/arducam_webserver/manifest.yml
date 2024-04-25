@@ -1,6 +1,0 @@
-source: Partner
-os:
-  - freertos
-requires:
-  - mcu_kit
-  - sensor

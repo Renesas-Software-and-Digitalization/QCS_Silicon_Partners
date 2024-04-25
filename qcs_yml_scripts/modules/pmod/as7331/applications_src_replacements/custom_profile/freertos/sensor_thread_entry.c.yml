@@ -1,0 +1,35 @@
+# qe_gen\ble\app_main.c replacements
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@INCLUDES'
+    replace: |
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_DECLARATION'
+    replace: |
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+          float as7331_temp, as7331_uv[3];
+          g_as7331_quick_setup();
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_LOOP'
+    replace: |
+          g_as7331_sensor0_read(&as7331_temp, as7331_uv);
+          float data[SENSOR_DATA_COUNT]={as7331_temp, as7331_uv[0], as7331_uv[1], as7331_uv[2]};
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |

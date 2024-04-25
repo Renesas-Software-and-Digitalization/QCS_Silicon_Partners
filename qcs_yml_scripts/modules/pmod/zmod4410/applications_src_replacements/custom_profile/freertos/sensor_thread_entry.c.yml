@@ -1,0 +1,35 @@
+# qe_gen\ble\app_main.c replacements
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@INCLUDES'
+    replace: |
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_DECLARATION'
+    replace: |
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+          rm_zmod4xxx_iaq_2nd_data_t  zmod_data;
+          g_zmod4410_sensor0_quick_setup();
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_LOOP'
+    replace: |
+          g_zmod4410_sensor0_quick_getting_air_quality_data(&zmod_data);
+          float data[SENSOR_DATA_COUNT]={(float)zmod_data.iaq, (float)zmod_data.eco2};
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |

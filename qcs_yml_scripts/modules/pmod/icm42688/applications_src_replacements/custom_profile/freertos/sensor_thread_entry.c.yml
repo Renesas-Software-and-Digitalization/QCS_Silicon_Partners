@@ -1,0 +1,36 @@
+# qe_gen\ble\app_main.c replacements
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@INCLUDES'
+    replace: |
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_DECLARATION'
+    replace: |
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+          float icm42688_temp, icm42688_acc[3], icm42688_gyro[3];
+          g_icm42688_quick_setup();
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_LOOP'
+    replace: |
+          g_icm42688_sensor0_read(&icm42688_temp, icm42688_acc, icm42688_gyro);
+          float data[SENSOR_DATA_COUNT]={icm42688_temp, icm42688_acc[0], icm42688_acc[1], icm42688_acc[2],
+                                        icm42688_gyro[0], icm42688_gyro[1], icm42688_gyro[2]};
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |

@@ -1,0 +1,201 @@
+{% if mcu_kit == "ek_ra2e1" or mcu_kit == "ek_ra2l1" or mcu_kit == "ek_ra6m4" or mcu_kit == "ek_ra6m5" or mcu_kit == "ek_ra4m3" %}
+  - op: change_pin
+    id: spi0
+    attr: mode
+    value: mode.disabled
+    success: yes
+{% endif %}
+
+{% if mcu_kit == "ek_ra4m2" %}
+  - op: change_pin
+    id: sci4
+    attr: mode
+    value: mode.disabled
+    success: yes
+{% endif %}
+
+{% if mcu_kit == "fpb_ra0e1" %}
+  # disable input 
+  - op: change_pin
+    id: p110
+    attr: gpio_mode
+    value: gpio_mode.disabled
+    success: yes
+
+  # disable input 
+  - op: change_pin
+    id: p112
+    attr: gpio_mode
+    value: gpio_mode.disabled
+    success: yes
+{% endif %}
+
+{% if mcu_kit == "ek_ra8m1" %}
+  # change the operation mode
+  - op: change_pin
+    id: sci0
+    attr: mode
+    value: mode.disabled
+    success: yes
+{% endif %}
+
+{% if mcu_kit == "ek_ra8d1" %}
+  # Disable sdram
+  - op: change_pin
+    id: sdram
+    attr: mode
+    value: mode.disabled
+    success: yes
+  # change the operation mode 
+  - op: change_pin
+    id: sci0
+    attr: mode
+    value: mode.disabled
+    success: yes
+{% endif %}
+
+{% if mcu_kit == "ek_ra6e2" or mcu_kit == "ek_ra4e2" %}
+  # disable input 
+  - op: change_pin
+    id: p110
+    attr: gpio_mode
+    value: gpio_mode.disabled
+    success: yes
+
+  # disable input 
+  - op: change_pin
+    id: p109
+    attr: gpio_mode
+    value: gpio_mode.disabled
+    success: yes
+{% endif %}
+
+{% if mcu_kit == "ek_ra8m1" or mcu_kit == "ek_ra8d1" or mcu_kit == "fpb_ra0e1" or mcu_kit == "ek_ra6e2" or mcu_kit == "ek_ra4e2" or mcu_kit == "bgk_ra6e2" %}
+  # change the operation mode to simple i2c
+  - op: change_pin
+    id: {{board.pmod.pmod1.pmod_i2c.i2c.channel}}
+    attr: mode
+    value: mode.simplei2c.free 
+    success: yes
+{% elif mcu_kit == "fpb_ra6e2" %}
+  {# # change the operation mode to simple r_iic
+  - op: change_pin
+    id: i3c_fslash_iic
+    attr: mode
+    value: mode.custom.free
+    success: yes #}
+{%- else %}
+  # change the operation mode to simple i2c
+  - op: change_pin
+    id: {{board.pmod.pmod1.pmod_i2c.i2c.channel}}
+    attr: mode
+    value: mode.iic.free 
+    success: yes
+{%- endif %} 
+
+
+ # change SCL pin
+{% if mcu_kit == "ek_ra8m1" or mcu_kit == "ek_ra8d1" or mcu_kit == "ek_ra6e2" or mcu_kit == "ek_ra4e2" or mcu_kit == "bgk_ra6e2" %}
+  - op: change_connectivity
+    id: {{board.pmod.pmod1.pmod_i2c.i2c.channel}}
+    pin: rxd{{board.pmod.pmod1.pmod_i2c.i2c.channel[-1]}}   # RA8M1 - rxd = scl
+    port: {{board.pmod.pmod1.pmod_i2c.pins.scl}}
+    success: yes
+{%- elif mcu_kit == "fpb_ra0e1" %}
+  - op: change_connectivity
+    id: {{board.pmod.pmod1.pmod_i2c.i2c.channel}}
+    pin: scl{{board.pmod.pmod1.pmod_i2c.i2c.channel[-2:]}}   # RA0E1-> sclxx
+    port: {{board.pmod.pmod1.pmod_i2c.pins.scl}}
+    success: yes
+{%- elif mcu_kit == "fpb_ra6e2" %}
+  {# - op: change_connectivity
+    id: i3c_fslash_iic
+    pin: i3c_scl 
+    port: {{board.pmod.pmod1.pmod_i2c.pins.scl}}
+    success: yes #}
+{%- else %}
+  - op: change_connectivity
+    id: {{board.pmod.pmod1.pmod_i2c.i2c.channel}}
+    pin: scl   # RA6M4 does not add the channel number on the scl pin  
+    port: {{board.pmod.pmod1.pmod_i2c.pins.scl}}
+    success: yes
+{%- endif %}    
+
+  # change SDA pin
+{% if mcu_kit == "ek_ra8m1" or mcu_kit == "ek_ra8d1" or mcu_kit == "ek_ra6e2" or mcu_kit == "ek_ra4e2" or mcu_kit == "bgk_ra6e2" %}
+  - op: change_connectivity
+    id: {{board.pmod.pmod1.pmod_i2c.i2c.channel}}
+    pin: txd{{board.pmod.pmod1.pmod_i2c.i2c.channel[-1]}}   # RA8M1 - txd = sda
+    port: {{board.pmod.pmod1.pmod_i2c.pins.sda}}
+    success: yes
+{%- elif mcu_kit == "fpb_ra0e1" %}
+  - op: change_connectivity
+    id: {{board.pmod.pmod1.pmod_i2c.i2c.channel}}
+    pin: sda{{board.pmod.pmod1.pmod_i2c.i2c.channel[-2:]}}   # RA0E1-> sclxx
+    port: {{board.pmod.pmod1.pmod_i2c.pins.sda}}
+    success: yes
+{%- elif mcu_kit == "fpb_ra6e2" %}
+  {# - op: change_connectivity
+    id: i3c_fslash_iic
+    pin: i3c_sda 
+    port: {{board.pmod.pmod1.pmod_i2c.pins.scl}}
+    success: yes #}
+{%- else %}
+  - op: change_connectivity
+    id: {{board.pmod.pmod1.pmod_i2c.i2c.channel}}
+    pin: sda   # RA6M4 does not add the channel number on the sda pin   
+    port: {{board.pmod.pmod1.pmod_i2c.pins.sda}}
+    success: yes
+{%- endif %}   
+
+  # change the mode config of port RESET to *output low mode*
+  - op: change_pin
+    id: {{board.pmod.pmod1.pmod_i2c.pins.reset}}
+    attr: gpio_mode
+    value: gpio_mode.gpio_mode_out.low
+    success: yes
+
+  # disable input for IRQ
+  - op: change_pin
+    id: {{board.pmod.pmod1.pmod_i2c.pins.int}}
+    attr: gpio_mode
+    value: gpio_mode.disabled
+    success: yes
+
+{% if 'ds' in board.pmod.pmod1.pmod_i2c.irq %}
+  {% set irqNumber = pmod_sensor_irq | replace('irq', '') | replace('-ds', '') %}
+  {% set pmod1_irq_id = 'irq' ~ irqNumber %}
+  {% set pmod1_irq_pin = 'irq' ~ irqNumber ~ '_dash_ds' %}
+{%- else %}
+  {% set irqNumber = board.pmod.pmod1.pmod_i2c.irq | replace('irq', '') | int %}
+  {% set pmod1_irq_id = board.pmod.pmod1.pmod_i2c.irq %}
+  {% set pmod1_irq_pin = board.pmod.pmod1.pmod_i2c.irq %}
+{% endif %}
+
+{% if mcu_kit == "ek_ra8m1" or mcu_kit == "ek_ra8d1" %}
+      # IRQ 
+  - op: change_connectivity
+    id: {{pmod1_irq_id}}
+    pin: {{pmod1_irq_pin}}
+    port: {{board.pmod.pmod1.pmod_i2c.pins.int}}
+    success: yes
+{%- elif mcu_kit == "ek_ra6e2"  or mcu_kit == "bgk_ra6e2" or mcu_kit == "fpb_ra6e2" or mcu_kit == "fpb_ra0e1" or mcu_kit == "ek_ra4e2" %}
+      # IRQ 
+  - op: change_connectivity
+    id: irq
+    pin: {{pmod1_irq_pin}}
+    port: {{board.pmod.pmod1.pmod_i2c.pins.int}}
+    success: yes
+{%- else %}
+      # IRQ 
+  - op: change_connectivity
+    id: irq0
+{% if irqNumber < 10 %}
+    pin: irq0{{irqNumber}}
+{% else %}
+    pin: irq{{irqNumber}}
+{% endif %}  
+    port: {{board.pmod.pmod1.pmod_i2c.pins.int}}
+    success: yes
+{%- endif %}  
+

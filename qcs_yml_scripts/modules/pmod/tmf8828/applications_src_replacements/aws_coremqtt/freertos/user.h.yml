@@ -1,0 +1,33 @@
+# user.h replacements
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@INCLUDES'
+    replace: |
+      #include "tmf8828_sensor.h"
+      
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@MACROS'
+    replace: |
+        #define WIFI_SSID               ""
+        #define WIFI_PWD                ""
+
+        #define IO_USERNAME             ""
+
+        #define EXAMPLE_MQTT_HOST       ""
+
+        #define SENSOR_DATA_COUNT       ( 1 )
+        #define TMF_TOF_TOPIC          "/feeds/tof"
+        #define USER_LED_TOPIC         "/feeds/led"
+
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@EXTERN_GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@FN_DECLARATION'
+    replace: |
+

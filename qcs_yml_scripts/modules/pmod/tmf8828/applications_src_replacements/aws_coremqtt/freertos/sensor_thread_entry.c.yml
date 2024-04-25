@@ -1,0 +1,38 @@
+# src/sensor_thread_entry.c replacements
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@INCLUDES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_DECLARATION'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+          int obj0conf[8][8] = {0}, obj0dist[8][8] = {0}, obj1conf[8][8] = {0}, obj1dist[8][8] = {0};
+          g_tmf8828_quick_setup();
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_LOOP'
+    replace: |
+          g_tmf8828_sensor0_read(obj0conf, obj0dist, obj1conf, obj1dist);
+          float data[SENSOR_DATA_COUNT]={(float)obj0dist[0][1]};
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |
+

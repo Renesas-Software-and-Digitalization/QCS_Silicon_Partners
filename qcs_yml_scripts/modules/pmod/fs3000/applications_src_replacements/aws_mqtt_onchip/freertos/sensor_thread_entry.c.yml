@@ -1,0 +1,40 @@
+# src/sensor_thread_entry.c replacements
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@INCLUDES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_DECLARATION'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+          rm_fsxxxx_data_t  fs3000_data;    
+          g_fs3000_sensor0_quick_setup();
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@MAIN_LOOP'
+    replace: |
+          float fs3000_sens_data;
+          g_fs3000_sensor0_quick_getting_flow(&fs3000_data);
+          fs3000_sens_data = (float)fs3000_data.flow.integer_part + (float)fs3000_data.flow.decimal_part / 100.0f;
+          float data[SENSOR_DATA_COUNT]={fs3000_sens_data, (float)fs3000_data.count};
+
+  - op: replace_in_file
+    src: 'src/sensor_thread_entry.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |
+

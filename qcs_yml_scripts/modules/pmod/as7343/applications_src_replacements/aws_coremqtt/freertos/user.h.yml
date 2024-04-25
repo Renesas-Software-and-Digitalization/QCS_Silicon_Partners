@@ -1,0 +1,42 @@
+# user.h replacements
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@INCLUDES'
+    replace: |
+      #include "as7343_sensor.h"
+      
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@MACROS'
+    replace: |
+        #define WIFI_SSID               ""
+        #define WIFI_PWD                ""
+
+        #define IO_USERNAME             ""
+
+        #define EXAMPLE_MQTT_HOST       ""
+
+        #define SENSOR_DATA_COUNT       ( 10 )
+        #define AS7343_415NM_TOPIC        "/feeds/adc0_415nm"
+        #define AS7343_445NM_TOPIC        "/feeds/adc1_445nm"
+        #define AS7343_480NM_TOPIC        "/feeds/adc2_480nm"
+        #define AS7343_515NM_TOPIC        "/feeds/adc3_515nm"
+        #define AS7343_555NM_TOPIC        "/feeds/adc0_555nm"
+        #define AS7343_590NM_TOPIC        "/feeds/adc1_590nm"
+        #define AS7343_630NM_TOPIC        "/feeds/adc2_630nm"
+        #define AS7343_680NM_TOPIC        "/feeds/adc3_680nm"
+        #define AS7343_CLEAR_TOPIC        "/feeds/adc4_clear"
+        #define AS7343_NIR_TOPIC          "/feeds/adc5_nir"
+        #define USER_LED_TOPIC            "/feeds/led"
+
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@EXTERN_GLOBAL_VARIABLES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/user.h'
+    match: '@FN_DECLARATION'
+    replace: |
+

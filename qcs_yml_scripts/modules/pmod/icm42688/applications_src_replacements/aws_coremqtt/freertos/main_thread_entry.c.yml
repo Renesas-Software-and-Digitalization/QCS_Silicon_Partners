@@ -1,0 +1,45 @@
+# src/main_thread_entry.c replacements
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@INCLUDES'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@FN_DECLARATION'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@GLOBAL_VARIABLES'
+    replace: |
+            const char *pPubTopics[SENSOR_DATA_COUNT] = {
+                                                            TEMP_SENS_TOPIC,
+                                                            ACC_X_SENS_TOPIC,
+                                                            ACC_Y_SENS_TOPIC,
+                                                            ACC_Z_SENS_TOPIC,
+                                                            GYRO_X_SENS_TOPIC,
+                                                            GYRO_Y_SENS_TOPIC,
+                                                            GYRO_Z_SENS_TOPIC,
+            };
+            
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@MAIN_INITIALIZATION'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@MAIN_LOOP'
+    replace: |
+
+
+  - op: replace_in_file
+    src: 'src/main_thread_entry.c'
+    match: '@FN_IMPLEMENTATION'
+    replace: |
+
+    
