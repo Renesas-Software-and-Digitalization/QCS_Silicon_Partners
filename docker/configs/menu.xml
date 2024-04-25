@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/ file:///usr/share/openbox/menu.xsd">
+    <menu id="root-menu" label="Openbox 3">
+        <item label="Enable clipboard. For copy and paste see Clipboard in left NoVNC menu.">
+            <action name="Execute">
+                <execute>/usr/bin/vncconfig</execute>
+            </action>
+        </item>
+        <item label="e2 studio">
+            <action name="Execute">
+                <execute>/usr/bin/e2studio -data /e2_studio/workspace/</execute>
+            </action>
+        </item>
+        <item label="Install new packs">
+            <action name="Execute">
+                <execute>/usr/bin/x-terminal-emulator -e /e2_studio/scripts/install_packs.sh -it</execute>
+            </action>
+        </item>
+        <item label="XML testing">
+            <action name="Execute">
+                <execute>/usr/bin/x-terminal-emulator -e /e2_studio/scripts/qcs_xml_entrypoint.sh</execute>
+            </action>
+        </item>
+        <!-- <item label="Export projects in default workspace to Artifactory">
+            <action name="Execute">
+                <execute>/usr/bin/x-terminal-emulator -e /e2_studio/scripts/export_workspace.sh</execute>
+            </action>
+        </item> -->
+        <item label="Terminal">
+            <action name="Execute">
+                <execute>/usr/bin/x-terminal-emulator</execute>
+            </action>
+        </item>
+        <item label="Open folder in text editor">
+            <action name="Execute">
+                <execute>/usr/bin/x-terminal-emulator -e /e2_studio/scripts/open_file_editor.sh</execute>
+            </action>
+        </item>
+        <item label="Htop">
+            <action name="Execute">
+                <execute>/usr/bin/x-terminal-emulator -e htop</execute>
+            </action>
+        </item>
+    </menu>
+</openbox_menu>

@@ -1,0 +1,30 @@
+version: '3'
+services:
+  e2studio:
+    image: ghcr.io/renesas-sst/qcs/e2studio:${E2_VERSION:-latest}
+    container_name: e2studio
+    environment:
+      # If this variable is set to URL where the packs can be downloaded then these packs will be downloaded and installed during the initiation of the container.
+      # Otherwise, set to null to use the default
+      ENV_FSP_PACKS_URL: ${FSP_DOWNLOAD_URL:-}
+      # Needed for building CM85 (eg: RA8x1) projects. IDE-56919
+      ARM_TOOL_VARIANT: ult
+      #
+      REPO_URL: ${GIT_CLONE_URL}
+      ENV_WORKSPACE_PATH: ${E2_WORKSPACE}
+      ENV_BUILD_PATH: ${PROJECT_ROOT}
+    ports:
+      # The first 8080 is the port on your PC where session will be available and you can change. Do not change the 2nd port which
+      # is the port that is mapped inside the container. If you're running this locally, then you can enter 'localhost:8080' into
+      # your web browser. If you have multiple containers running then you might need to move to another port.
+      # For example: '8081:8080' would move this container to beinga available on port 8081.
+      - '8080:8080'
+    volumes:
+      - "../scripts:/e2_studio/scripts"
+      - "./configs/menu.xml:/var/lib/openbox/debian-menu.xml"
+    # This will map a folder from your local PC to the container. Inside the container, the default workspace is /e2_studio/workspace
+    # By default no volumes are used which means each time you create this container it will be a brand new image. If you create a project
+    # in the container and then recreate the container then the project will not be there.
+    # volumes:
+    #   - <local_pc_path>:/e2_studio/workspace
+    restart: unless-stopped

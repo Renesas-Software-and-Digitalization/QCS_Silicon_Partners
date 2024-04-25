@@ -1,0 +1,536 @@
+# Create TrustZone projects
+- name: tz_s
+  fsp_version: default
+  board_or_device: EK-RA6M4
+  toolchain: ac6
+  toolchain_version: default
+  rtos: No RTOS
+  template: Bare Metal - Minimal
+  type: secure
+  sequence:
+    - op: build
+      completed: 1
+- name: tz_ns
+  fsp_version: default
+  board_or_device: EK-RA6M4
+  toolchain: ac6
+  toolchain_version: default
+  rtos: No RTOS
+  template: Bare Metal - Minimal
+  type: nonsecure
+  secure_project: tz_s
+  sequence:
+    - op: build
+      completed: 1
+
+# Test file operations
+- name: add_file_and_modify_0
+  fsp_version: default
+  board_or_device: EK-RA6M3
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  template: Bare Metal - Minimal
+  sequence:
+    - op: get_hal
+      name: hal
+    - op: build
+      completed: 1
+
+    - op: add
+      id: module.driver.timer_on_gpt
+      name: gpt0
+      thread: hal
+
+    - op: change_property
+      name: gpt0_name
+      type: instance
+      module_or_thread: gpt0
+      id: module.driver.timer.name
+      value: my_gpt0
+      success: yes
+
+    - op: build
+      completed: 1
+
+    # Add function to call open()
+    - op: insert_in_file
+      src: src/hal_entry.c
+      line: 1
+      text: '#include "test_gpt0.h"'
+
+    - op: insert_in_file
+      src: src/hal_entry.c
+      line: EOF
+      text: |
+        void gpt_test0 (void)
+        {
+          fsp_err_t err;
+          FSP_PARAMETER_NOT_USED(err);
+          err = R_GPT_Open(&my_gpt0_ctrl, &my_gpt0_cfg);
+        }
+
+    - op: add_file
+      src: scripts/xml_testing/.xml_tests/test_gpt0.h
+      dst: src/test_gpt0.h
+
+    - op: replace_in_file
+      src: src/hal_entry.c
+      match: '/* TODO: add your own code here */'
+      replace: |
+        gpt_test0();
+
+# Test checking value of <property> that has <export>
+- name: check_gpt_period_calculation0
+  fsp_version: default
+  board_or_device: EK-RA6M3
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  template: Bare Metal - Minimal
+  sequence:
+    - op: get_hal
+      name: hal
+    - op: generate
+
+    - op: add
+      id: module.driver.timer_on_gpt
+      name: gpt0
+      thread: hal
+
+    # Change period
+    - op: change_property
+      name: gpt0_period
+      type: instance
+      module_or_thread: gpt0
+      id: module.driver.timer.period
+      value: 10
+      success: yes
+
+    - op: change_property
+      name: gpt0_unit
+      type: instance
+      module_or_thread: gpt0
+      id: module.driver.timer.unit
+      value: module.driver.timer.unit.unit_period_msec
+      success: yes
+
+    - op: generate
+
+    # Check the <export> for period is correct
+    - op: search_file
+      src: ra_gen/hal_data.c
+      # List of regexes that must be matched. If any entries are not caught then this operation will be considered as failed.
+      regex_matches:
+        - ^.*\.period_counts\s+=[\s\n]+\(uint32_t\)\s+0x124f80,\s+\.duty_cycle_counts\s+=\s+0x927c0
+
+# Test deleting a dependency
+- name: delete_depency_0
+  fsp_version: default
+  board_or_device: EK-RA6M3
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  template: Bare Metal - Minimal
+  sequence:
+    - op: get_hal
+      name: hal
+
+    - op: add
+      id: module.middleware.rm_vee_flash
+      name: vee0
+      thread: hal
+
+    - op: build
+      completed: 1
+
+    # Delete Flash HP get_dependency
+    - op: delete_dependency
+      module: vee0
+      requires_id: module.middleware.rm_vee_flash.requires.flash
+
+    # Verify build fails without dependency
+    - op: build
+      completed: 0
+
+# Test getting a top of stack and registering to name so we can do further work with it
+- name: get_top_of_stack_0
+  fsp_version: default
+  board_or_device: EK-RA6M3
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  # Specify template name exactly
+  template: Bare Metal - Minimal
+  sequence:
+    - op: get_hal
+      name: hal
+    - op: generate
+
+    # All projects have ioport by default.
+    - op: get_stack
+      thread: hal
+      id: module.driver.ioport_on_ioport
+      name: ioport
+
+    # This will cause a build to fail since the g_ioport name is used in the default hal_entry.c
+    # code. This will show us that the module was found properly though.
+    - op: change_property
+      name: ioport_name
+      type: instance
+      module_or_thread: ioport
+      id: module.driver.ioport.name
+      value: this_will_fail
+      success: yes
+    - op: build
+      completed: 0
+
+    # Change name back an verify build is successful again
+    - op: change_property
+      name: ioport_name
+      type: instance
+      module_or_thread: ioport
+      id: module.driver.ioport.name
+      value: g_ioport
+      success: yes
+    - op: build
+      completed: 1
+
+    # Add 3 instances of GPT and get 2nd created one "g_timer1"
+    - op: add
+      id: module.driver.timer_on_gpt
+      name: gpt0
+      thread: hal
+    - op: add
+      id: module.driver.timer_on_gpt
+      name: gpt1
+      thread: hal
+    - op: add
+      id: module.driver.timer_on_gpt
+      name: gpt2
+      thread: hal
+    - op: get_stack
+      thread: hal
+      id: module.driver.timer_on_gpt
+      name: gpt_found
+      property_id: module.driver.timer.name
+      property_value: g_timer1
+
+    # Change name to one that is already taken. This will flag a constraint, but is still allowed.
+    - op: change_property
+      name: gpt_name_conflict
+      type: instance
+      module_or_thread: gpt_found
+      id: module.driver.timer.name
+      value: g_timer0
+      success: yes
+
+    # Will not build with duplicate symbols
+    - op: build
+      completed: 0
+
+    # Change name to something valid
+    - op: change_property
+      name: gpt_name_ok
+      type: instance
+      module_or_thread: gpt_found
+      id: module.driver.timer.name
+      value: my_found_timer
+      success: yes
+
+    - op: build
+      completed: 1
+
+# Test changing clocks
+- name: change_clocks_0
+  fsp_version: default
+  board_or_device: EK-RA6M3
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  template: Bare Metal - Minimal
+  sequence:
+
+    # Change clock and confirm result in bsp_clock_cfg.h
+    - op: change_clock
+      id: board.clock.pclka.div
+      value: board.clock.pclka.div.4
+
+    # Set value using integer
+    - op: change_clock
+      id: board.clock.xtal.freq
+      value: 20000000
+
+    - op: generate
+
+    - op: search_file
+      src: ra_gen/bsp_clock_cfg.h
+      regex_matches:
+        - .*\n#define\sBSP_CFG_PCLKA_DIV\s\(BSP_CLOCKS_SYS_CLOCK_DIV_4\)
+        - .*\n#define\sBSP_CFG_XTAL_HZ\s\(20000000\)
+
+    - op: change_clock
+      id: board.clock.pclka.div
+      value: board.clock.pclka.div.2
+
+    - op: change_clock
+      id: board.clock.xtal.freq
+      value: 24000000
+
+    - op: generate
+
+    - op: search_file
+      src: ra_gen/bsp_clock_cfg.h
+      regex_matches:
+        - .*\n#define\sBSP_CFG_PCLKA_DIV\s\(BSP_CLOCKS_SYS_CLOCK_DIV_2\)
+        - .*\n#define\sBSP_CFG_XTAL_HZ\s\(24000000\)
+
+    # Cannot check clock constraints yet. https://jira.renesas.eu/browse/IDE-46865
+    # # Test constraint that ICLK must not be less than PCLKA or PCLKB
+    # - op: change_clock
+    #   id: board.clock.iclk.div
+    #   value: board.clock.iclk.div.64
+
+    # - op: check_constraints_message
+    #   search_text: ICLK must not be less than PCLKA or PCLKB
+    # - op: check_constraints_message
+    #   search_text: ICLK must not be less than FCLK
+
+    # # Set beyond maximum value
+    # - op: change_clock
+    #   id: board.clock.iclk.div
+    #   value: board.clock.iclk.div.1
+
+    # - op: check_constraints_message
+    #   search_text: Maximum frequency is 120MHz
+
+# Test to check availability of modules in Bare Metal project
+- name: check_module_availability_bare_metal
+  fsp_version: default
+  board_or_device: EK-RA6M3
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  # Specify template name exactly
+  template: Bare Metal - Minimal
+  sequence:
+    - op: get_hal
+      name: hal
+
+    # All projects can use r_crc
+    - op: check_if_module_can_be_added
+      thread: hal
+      id: module.driver.crc_on_crc
+      success: yes
+
+    # Bare metal projects cannot use NetX Duo
+    - op: check_if_module_can_be_added
+      thread: hal
+      id: module.azure.nxd.ip
+      success: no
+
+    # RA6M3 cannot use CANFD
+    - op: check_if_module_can_be_added
+      thread: hal
+      id: module.driver.canfd_on_canfd
+      success: no
+
+    # coreHTTP cannot be added to Bare Metal project
+    - op: check_if_module_can_be_added
+      thread: hal
+      id: module.aws.coreHttpsLib
+      success: no
+
+    # FileX can be added to bare metal project
+    - op: check_if_module_can_be_added
+      thread: hal
+      id: module.azure.fx.block_media
+      success: yes
+
+# Test to check availability of modules in FreeRTOS project
+- name: check_module_availability_freertos
+  fsp_version: default
+  board_or_device: EK-RA6M3
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: FreeRTOS
+  # Specify template name exactly
+  template: FreeRTOS - Minimal - Static Allocation
+  sequence:
+    - op: get_hal
+      name: hal
+    - op: create_thread
+      name: t0
+    - op: build
+      completed: 1
+
+    # All projects can use r_crc
+    - op: check_if_module_can_be_added
+      thread: t0
+      id: module.driver.crc_on_crc
+      success: yes
+
+    # FreeRTOS projects cannot use NetX Duo
+    - op: check_if_module_can_be_added
+      thread: t0
+      id: module.azure.nxd.ip
+      success: no
+
+    # RA6M3 cannot use CANFD
+    - op: check_if_module_can_be_added
+      thread: hal
+      id: module.driver.canfd_on_canfd
+      success: no
+
+    # coreHTTP can be added to FreeRTOS project
+    - op: check_if_module_can_be_added
+      thread: t0
+      id: module.aws.coreHttpsLib
+      success: yes
+
+    # FileX cannot be added to FreeRTOS project
+    - op: check_if_module_can_be_added
+      thread: t0
+      id: module.azure.fx.block_media
+      success: no
+
+# Test to check deleting a stack
+- name: check_delete_stack
+  fsp_version: default
+  board_or_device: EK-RA6M3
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  # Specify template name exactly
+  template: Bare Metal - Minimal
+  sequence:
+    - op: get_hal
+      name: hal
+
+    # Add FileX. It will not build without enabling Standalone mode
+    - op: add
+      name: fx
+      id: module.azure.fx.block_media
+      thread: hal
+
+    - op: build
+      completed: 0
+
+    # Delete stack and project will build again
+    - op: delete_stack
+      name: fx
+      thread: hal
+
+    - op: build
+      completed: 1
+
+# Test to selecting bitmap and then deselecting
+- name: check_deselect_option
+  fsp_version: default
+  board_or_device: MCK-RA6T2
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  # Specify template name exactly
+  template: Bare Metal - Minimal
+  sequence:
+    - op: get_hal
+      name: t0
+
+    # Add gpt to stacks
+    - op: add
+      name: gpt
+      id: module.driver.timer_on_gpt
+      thread: t0
+
+    # Generate project content
+    - op: generate
+
+    # Select a channel that does not support event/pin count source on some MCUs
+    - op: change_property
+      name: change_channel
+      type: instance
+      module_or_thread: gpt
+      id: module.driver.timer.channel
+      value: 4
+
+    # Verify no constraints yet
+    - op: check_constraints_number
+      number: 0
+
+    # Set count up source, causing a constraint message on some MCUs
+    - op: change_property
+      name: pin_count_up
+      type: instance
+      module_or_thread: gpt
+      id: module.driver.timer.count_up_source
+      value: module.driver.gpt.source_gtetrga_rising
+
+    - op: check_constraints_number
+      number: 1
+
+    - op: check_constraints_message
+      search_text: Event count up/down source selection not available on this MCU
+
+    # Deselect count up option to remove constraint
+    - op: deselect_option
+      name: remove_count_up_source
+      type: instance
+      module_or_thread: gpt
+      id: module.driver.timer.count_up_source
+      value: module.driver.gpt.source_gtetrga_rising
+
+    # Verify no constraint errors now
+    - op: check_constraints_number
+      number: 0
+
+# Check fill_requires, find_module
+- name: test_fill_requires_and_find_module
+  fsp_version: default
+  board_or_device: EK-RA6M4
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: Azure
+  template: Azure RTOS ThreadX - Minimal
+  sequence:
+    - op: create_thread
+      name: t0
+
+    - op: add
+      name: lx
+      id: module.azure.lx.nor.spi
+      thread: t0
+
+    - op: find_module
+      name: lx_nor_spi
+      module: lx
+      requires_id: module.azure.lx.nor.requires.lx_nor_spi
+
+    - op: fill_requires
+      name: spi_flash
+      module: lx_nor_spi
+      requires_id: module.middleware.rm_levelx_nor_spi.requires.spi
+      module_id: module.driver.qspi_on_qspi
+
+# Test to selecting bitmap and then deselecting
+- name: test_get_dependency
+  fsp_version: default
+  board_or_device: EK-RA6M4
+  toolchain: GNU ARM Embedded
+  toolchain_version: default
+  rtos: No RTOS
+  template: Bare Metal - Minimal
+  sequence:
+    - op: get_hal
+      name: t0
+
+    - op: add
+      name: fx
+      id: module.azure.fx.block_media
+      thread: t0
+
+    # FileX I/O Driver
+    - op: get_dependency
+      name: fx_io
+      module: fx
+      requires_id: module.azure.fx.requires.rm_filex_block_media

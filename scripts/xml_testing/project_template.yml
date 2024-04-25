@@ -1,0 +1,264 @@
+# The root of this document is a list of projects to be built. Each project should have a unique name since it will be the name of the e2studio project created.
+- name: unique_project name
+  # Specify the FSP version:
+  #   Use 'default' to take whatever is installed. Can specify a specific version as well.
+  #   fsp_version: 3.1.0-alpha0+20210522.5b45f16c
+  fsp_version: default
+  # Specify whether to choose a board or device (Custom User BSP) when creating project.
+  #   If choosing board then use name as shown in list.
+  #   If choosing device, then enter full part numbers.
+  #     board_or_device: R7FA2A1AB2CBT
+  board_or_device: EK-RA6M3
+  # Which toolchain to use.
+  #   - gcc
+  #   - iar
+  #   - ac6
+  toolchain: gcc
+  # Which version of the chosen toolchain to use.
+  #   Use 'default' to take whatever is installed. Can specify a specific version as well.
+  #   toolchain_version: 9.3.1.20200408
+  toolchain_version: default
+  # Which RTOS to use.
+  #   Options: "No RTOS", "FreeRTOS", "Azure"
+  rtos: No RTOS
+  # Specify template name exactly. eg:
+  # - Bare Metal - Minimal
+  # - FreeRTOS - Minimal - Static Allocation
+  # - Azure RTOS ThreadX - Minimal
+  template: Bare Metal - Minimal
+  # Type of project. Current options are:
+  # - flat
+  # - secure
+  # - nonsecure
+  # If using nonsecure, then you will need to point to secure project using secure_project name below.
+  # If not provided then "flat" is assumed.
+  type: flat
+  # If this is a nonsecure project then we need a secure project to get the secure bundle from.
+  # This option can be ignored for projects other than nonsecure projects.
+  secure_project: project_name_s
+  # This defines the sequence of operations that will be applied to the project created from the above information.
+  # Possible operations are detailed below.
+  # Common members are "op" and "name".
+  #   "op"
+  #     The operation to perform. This is an enumerated list.
+  #   "name"
+  #     A variable name that is a way of referring to the output of the current operation later. For example, if you want to change
+  #     the property of an instance, then you can reference that instance by using its "name" instead of having to provide an exact ID every time.
+  sequence:
+
+    #### Building, generating, and checking results ####
+
+    # The expected result of the build. Sometimes we may want to verify that certain changes cause warnings or errors.
+    # We can currently check build results. Constraints can be checked in sequence sections.
+    - op: build
+      # Did project complete building. If build completes that also means there were 0 errors.
+      completed: 1
+      # Warnings are only captured on files with "*/fsp/*" in the path. We can allow warnings that are captured by creating a regex to match them.
+      # Expressions in warnings_allowed must have both a folder or filename and the warning type. This avoids unintentionally silencing warnings.
+      # Examples of this are below were "rm_psa_crypto" will match a folder and 'unused-parameter' matches the warning to be accepted.
+      warnings_allowed:
+        - '.*rm_psa_crypto.*unused-parameter.*'
+        - '.*rm_psa_crypto.*conversion.*'
+        - '.*rm_mbedtls.*conversion.*'
+        - '.*rm_psa_crypto.*unused-function.*'
+
+    # Read a file and look for certain contents. Main purpose of this currently is to look for proper output when a <property> has an <export>.
+    # When this ticket is completed, https://jira.renesas.eu/browse/IDE-45602, we could check <export> by reading from EASE directly.
+    - op: search_file
+      # Path to file to search
+      src: src/hal_entry.c
+      # List of regexes that must be matched. If any entries are not caught then this operation will be considered as failed.
+      regex_matches:
+        # This is an example for r_ether MAC address
+        - .*uint8_t\s[a-zA-Z0-9_]+\[6\]\s=\s{\s0x00,0x11,0x22,0x33,0x44,0x55
+
+    # This will generate project content without having to build. This saves time.
+    - op: generate
+
+    #### Thread & HAL/Common operations ####
+
+    # Will register HAL/Common thread with "name" for future use. This is always available so it cannot be created.
+    - op: get_hal
+      name: hal
+
+    # Will create a new thread and register to "name". mkp-<O>""
+    - op: create_thread
+      name: t0
+
+    # Check if module can be added to the specified thread. For example, FileX cannot be added to FreeRTOS project, but can be added to Azure RTOS or bare metal project.
+    - op: check_if_module_can_be_added
+      # Which thread to check. Some modules can only be added to Thread or HAL/Common.
+      thread: hal
+      # Which <module id=""> to check for
+      id: module.azure.fx.block_media
+      # Whether "id" will be found in the list of module IDs that can be added
+      success: yes
+
+    #### Module operations ####
+
+    # Add a module instance.
+    - op: add
+      name: uart_stack0
+      # The <module id=""> to select
+      id: module.driver.uart_on_sci_uart
+      # Which thread to add this module instance too. This should be a previously registered "name"
+      thread: hal
+
+    # If a module has a dependency (ie <requires>) then it can be filled using this operation.
+    - op: fill_requires
+      name: dtc0
+      # Which module "name" to use. Must have been registered in previous operation (eg: add).
+      module: uart_stack0
+      # Which <requires id=""> to use.
+      requires_id: module.driver.uart_on_sci_uart.requires.transfer_tx
+      # Which <module id=""> to use for filling the dependency specified by "requires_id"
+      module_id: module.driver.transfer_on_dtc
+
+    # If a module has a dependency (ie <requires>) that is already filled in, then you can use this to get the module instance.
+    # This can be used to traverse down a stack one module at a time.
+    - op: get_dependency
+      name: dtc0
+      # Which module "name" to use. Must have been registered in previous operation (eg: add).
+      module: uart_stack0
+      # Which <requires id=""> to use.
+      requires_id: module.driver.uart_on_sci_uart.requires.transfer_tx
+
+    # Change property. This can change an instance or common property for a module or thread.
+    - op: change_property
+      name: uart_stack0_channel
+      # Options:
+      #  "instance"
+      #    For accessing property for specific module instance or thread.
+      #  "common"
+      #    For accessing property common for module instance or all threads
+      type: instance
+      # Previously named module or thread.
+      # Use 'bsp' for setting BSP properties. Use 'instance' for type
+      module_or_thread: uart_stack0
+      # Which <property id=""> to set.
+      id: module.driver.uart.channel
+      # Value to set for <property>. Can be integer or string.
+      value: 9
+      # Whether this operation should be successful. Options are "yes" or "no". Default is "yes" if not provided. This should only be "no" when you are
+      # testing a <constraint> inside of a <property>. Invalid options are not accepted by e2 studio so the constraint cannot be checked after attempting
+      # to set the value.
+      success: yes
+    # Another example this time setting enumerated common property.
+    - op: change_property
+      type: common
+      module_or_thread: uart_stack0
+      id: config.driver.sci_uart.dtc_support
+      value: config.driver.sci_uart.dtc_support.enabled
+      name: uart_dtc_support
+    # BSP example. Change MSP size.
+    - op: change_property
+      type: instance
+      module_or_thread: bsp
+      id: config.bsp.common.main
+      value: 0x1200
+      name: bsp_msp_size
+
+    # Delete a filled-in dependency of an existing module
+    - op: delete_dependency
+      # Which parent module "name" to use. Must have been registered in previous operation (eg: add).
+      module: spi_stack
+      # Which <requires id=""> to use.
+      requires_id: module.driver.spi_on_spi.requires.transfer_tx
+
+    # Find top of stack and register to name
+    - op: get_stack
+      # Which thread to search in. This name must have been registered earlier.
+      thread: hal
+      # Which ID to look for. This is the "id" attribute <module id="">.
+      id: module.driver.timer_on_gpt
+      # Name to register found top of stack to
+      name: gpt1
+      # [Optional] If there are 2 instances of the same module then you will need some way of distinguishing which one you want
+      #   Which <property> to check the value of
+      property_id: module.driver.timer.name
+      #   The value of property_id must match this value to be confirmed as a match
+      property_value: g_timer1
+
+    # Delete a top of stack
+    - op: delete_stack
+      # Which stack to delete. Must have been registered in previous operation (eg: add or get_stack).
+      name: spi_stack
+      # Which thread the stack is in.
+      thread: hal
+
+    #### Checking constraints ####
+
+    # Search for a certain constraint message to be currently active.
+    - op: check_constraints_message
+      # Will check for a match of this text as part of any of the current constraints
+      search_text: DTC support must be enabled to use DTC
+      # Whether the message should be found or not. Options are 'yes' and 'no'
+      found: yes
+
+    # Check for how many constraints are currently active in the project. Please note that this issue:
+    # Should be 1 but I'm following up on e2 issue: https://jira.renesas.eu/browse/IDE-44027
+    - op: check_constraints_number
+      number: 2
+
+    #### Modifying source files in project ####
+
+    # Perform string replacement in a file. Does not support regex at the moment.
+    - op: replace_in_file
+      # Path to file inside of project that should be modified.
+      src: src/hal_entry.c
+      # What string to match in the src file.
+      match: '/* TODO: add your own code here */'
+      # What to replace the string with. This can be multiline using YML multiline formatting as shown below.
+      replace: |
+        void uart_test0 (void);
+        uart_test0();
+        void uart_test1 (void);
+        uart_test1();
+
+    # Copy file from peaks repo into project.
+    - op: add_file
+      # Path to file to be copied. Starting path is the root of the peaks repo.
+      src: ra/fsp/src/r_sci_uart/.xml_tests/uart_test0.c
+      # Path of where to copy this file. Starting path is the project directory.
+      dst: src/uart_test0.c
+
+    # Insert text into a project.
+    - op: insert_in_file
+      # Path to file inside of project that should be modified.
+      src: src/hal_entry.c
+      # Line number of where to insert text.
+      #   <integer>
+      #     What line number to insert at.
+      #   EOF
+      #     Insert at end of file
+      line: 1
+      # Text to insert. This can be multiline using YML multiline formatting as shown below.
+      text: |
+        void uart_test0 (void);
+        uart_test0();
+        void uart_test1 (void);
+        uart_test1();
+    # Another example.
+    - op: insert_in_file
+      src: src/hal_entry.c
+      line: EOF
+      text: '//hello world'
+
+    #### Helper functions ####
+
+    # Find a module in a stack. This is a helper function so you do not have to create a list of get_dependency calls
+    - op: find_module
+      name: mbedtls_crypto_only
+      # Which module to start search from
+      module: sec_sock0
+      # Which <requires> to search for. This is the way to find the unique module you want
+      requires_id: module.arm.mbedtls.requires.psa_crypto
+
+    #### Clock functions ####
+
+    # Change a clock <node>
+    - op: change_clock
+      # <node id=""> to use
+      id: board.clock.hoco.freq
+      # New setting for this node
+      value: board.clock.hoco.freq.18m
