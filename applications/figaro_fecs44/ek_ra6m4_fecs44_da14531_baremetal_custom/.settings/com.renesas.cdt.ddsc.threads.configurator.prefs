@@ -1,0 +1,7 @@
+collapse/module.driver.ble_abs_gtl_transport_uart.1413499554=false
+collapse/module.driver.comms_i2c_on_comms_i2c_bus.1235594236=false
+collapse/module.driver.comms_i2c_on_comms_i2c_device.1661268447=false
+collapse/module.driver.i2c_on_sci_i2c.283807995=false
+collapse/module.driver.uart_on_sci_uart.1206523716=false
+collapse/module.middleware.ble_abs_gtl.1242505499=false
+eclipse.preferences.version=1
