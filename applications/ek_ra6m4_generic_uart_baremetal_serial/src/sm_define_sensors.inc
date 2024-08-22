@@ -24,7 +24,6 @@
  *****************************************************************************************/
 
 DEFINE_SENSOR_TYPE(TEMPERATURE, C, temperature)
-
 DEFINE_SENSOR_TYPE(HUMIDITY, %, humidity)
 
 
@@ -40,7 +39,7 @@ DEFINE_SENSOR_TYPE(HUMIDITY, %, humidity)
  *****************************************************************************************/
 
 DEFINE_SENSOR_DRIVER(hs3001_sensor)
-
+DEFINE_SENSOR_DRIVER(dummy_sensor)
 
 /******************************************************************************************
  *
@@ -59,8 +58,9 @@ DEFINE_SENSOR_DRIVER(hs3001_sensor)
  *****************************************************************************************/
 
 DEFINE_SENSOR_INSTANCE(TEMPERATURE, 0, SM_CH0, hs3001_sensor, 1, 100, 0, 0)
-
 DEFINE_SENSOR_INSTANCE(HUMIDITY, 0, SM_CH1, hs3001_sensor, 1, 100, 0, 0)
+DEFINE_SENSOR_INSTANCE(TEMPERATURE, 0, SM_CH0, dummy_sensor, 1, 100, 0, 500)
+DEFINE_SENSOR_INSTANCE(HUMIDITY, 0, SM_CH1, dummy_sensor, 1, 100, 0, 500)
 
 
 #undef DEFINE_SENSOR_INSTANCE

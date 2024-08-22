@@ -23,4 +23,4 @@
 
 // Uncomment the following define and set a global logging level which will
 // override the individual configurations of all modules
-//#define GLOBAL_LOGGING_LEVEL    LOG_DEBUG
+#define GLOBAL_LOGGING_LEVEL    LOG_DEBUG

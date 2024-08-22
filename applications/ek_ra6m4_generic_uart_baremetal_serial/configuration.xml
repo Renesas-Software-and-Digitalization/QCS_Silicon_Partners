@@ -262,6 +262,13 @@
       <property id="module.driver.i2c.ipl" value="board.icu.common.irq.priority12"/>
       <property id="module.driver.i2c.rx_ipl" value="_disabled"/>
     </module>
+    <module id="module.driver.comms_i2c_on_comms_i2c_device.1073448885">
+      <property id="module.driver.comms_i2c_device.name" value="g_comms_i2c_dummy_sensor"/>
+      <property id="module.driver.comms_i2c_device.semaphore_timeout" value="0xFFFFFFFF"/>
+      <property id="module.driver.comms_i2c_device.slave_address" value="0x50"/>
+      <property id="module.driver.comms_i2c_device.address_mode" value="module.driver.comms_i2c_device.address_mode.address_mode_7bit"/>
+      <property id="module.driver.comms_i2c_device.p_callback" value="dummy_sensor_callback"/>
+    </module>
     <context id="_hal.0">
       <stack module="module.driver.ioport_on_ioport.0"/>
       <stack module="module.driver.uart_on_sci_uart.86171751"/>
@@ -270,6 +277,11 @@
           <stack module="module.driver.comms_i2c_on_comms_i2c_bus.25198291" requires="module.driver.comms_i2c_device.requires.comms_i2c_bus">
             <stack module="module.driver.i2c_on_sci_i2c.1348794316" requires="module.driver.comms_i2c_bus.requires.i2c"/>
           </stack>
+        </stack>
+      </stack>
+      <stack module="module.driver.comms_i2c_on_comms_i2c_device.1073448885">
+        <stack module="module.driver.comms_i2c_on_comms_i2c_bus.25198291" requires="module.driver.comms_i2c_device.requires.comms_i2c_bus">
+          <stack module="module.driver.i2c_on_sci_i2c.1348794316" requires="module.driver.comms_i2c_bus.requires.i2c"/>
         </stack>
       </stack>
     </context>

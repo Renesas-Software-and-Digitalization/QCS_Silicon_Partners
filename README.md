@@ -6,9 +6,8 @@ To use this repo users must have:
 
 Hardware
 * EK-RA6M4
-* US082-INTERPEVZ
-* US159-DA14531EVZ
-* US159-DA16200MEVZ
+* US082-INTERPEVZ - required for I2C PMODs
+* UST-to-UART PMOD or equivalent adapter
 
 Software
 * FSP 5.3.0 platform installer bundle (e2_studio + FSP)
