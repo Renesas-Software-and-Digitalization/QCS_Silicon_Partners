@@ -64,6 +64,20 @@ uint32_t utils_systime_get(void) {
 #endif
 }
 
+void utils_delay_us(uint32_t delay) {
+    R_BSP_SoftwareDelay(delay, BSP_DELAY_UNITS_MICROSECONDS);
+}
+
+void utils_delay_ms(uint32_t delay) {
+#if (BSP_CFG_RTOS) == 0
+    R_BSP_SoftwareDelay(delay, BSP_DELAY_UNITS_MILLISECONDS);
+#elif (BSP_CFG_RTOS) == 1
+    tx_thread_sleep(delay);
+#elif (BSP_CFG_RTOS) == 2
+#endif    
+    
+}
+
 void utils_set_LED(bsp_io_port_pin_t pin, uint8_t state) {
     /* Enable access to the PFS registers. If using r_ioport module then register protection is automatically
      * handled. This code uses BSP IO functions to show how it is used.

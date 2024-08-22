@@ -99,8 +99,8 @@
             <slot name="P712" secure="true"/>
             <slot name="P713" secure="true"/>
         </peripheral>
-        <peripheral name="SCI0" group="SCI" security=""/>
         <peripheral name="SCI9" group="SCI" security=""/>
+        <peripheral name="SCI0" group="SCI" security=""/>
         <peripheral name="ICU">
             <slot name="IRQ0" secure="true"/>
             <slot name="IRQ1" secure="true"/>

@@ -86,6 +86,18 @@ fsp_err_t utils_systime_init(uint32_t freq);
  ***********************************************************************************************************************/
 uint32_t utils_systime_get(void);
 /*******************************************************************************************************************//**
+ * @brief       Blocks execution for a number of microseconds
+ * @param[in]   delay (in microseconds)
+ * Note that this is a blocking call even on an RTOS and it will block the thread! Scheduling is not disturbed.
+ ***********************************************************************************************************************/
+void utils_delay_us(uint32_t delay);
+/*******************************************************************************************************************//**
+ * @brief       Blocks execution for a number of milliseconds
+ * @param[in]   delay (in milliseconds)
+ * This is a blocking call on baremetal. On RTOS this function sleeps the thread.
+ ***********************************************************************************************************************/
+void utils_delay_ms(uint32_t delay);
+/*******************************************************************************************************************//**
  * @brief       Set LED to the specific state
  * @param[in]   pin - the pin where the LED is connected
  * @param[in]   state - the desired state (ON/OFF)
