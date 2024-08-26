@@ -2,7 +2,7 @@
 A brief description of the purpose and functionality of the module.
 
 ## Prerequisites
-Specify the Gardware/Software components necessary for testing and validation. 
+Specify the Hardware/Software components necessary for testing and validation. 
 
 ## Instructions
 * The steps and procedures for initializing the application, especially focusing on any product-specific requirements.
