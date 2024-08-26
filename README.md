@@ -33,11 +33,12 @@ shall be properly configured in the thin-layer driver. The instance definition a
 driver applies any scaling, use the multiplier, divider and offset factors to match the scaling properly. The last field is the reading interval.
 Set it to zero if the sensor uses its own internal state machine for sequencing, otherwise set the interval to the standard measurement rate for
 that sensor (usually 1000 for once a second).
-7. Make sure you include the logging headers:
+7. Make sure you include the logging headers as part of all your C source code:
 ![Logging](/images/readme_data/logging.PNG)
 For local-only logging, comment out the **include "log_disabled.h"** and uncomment the desired logging level. For global logging control please
 update the GLOBAL_LOGGING_LEVEL defined in the **global_logging_definitions.h** file under src/qc-middleware/common_utils. When defined, that
 symbol overrides any local logging setting!
+Please refer to [this file](https://github.com/fabiorenesas/QCS_Silicon_Partners/blob/feature/sm/applications/ek_ra6m4_generic_uart_baremetal_serial/src/qc-middleware/common_utils/logger.h#L16) for the usage of logging functions.
 8. DO NOT modify any files inside qc-middleware or any of the main application files (hal_entry.c, main_application.*, uart.*) if for some reason
 your code requires changing any of those files, contact the Renesas team and make sure your PR clarifies why that is needed.
 9. Create a new folder on images with your company and sensor name, then add the 3D rendered module image.
