@@ -33,7 +33,8 @@ shall be properly configured in the thin-layer driver. The instance definition a
 driver applies any scaling, use the multiplier, divider and offset factors to match the scaling properly. The last field is the reading interval.
 Set it to zero if the sensor uses its own internal state machine for sequencing, otherwise set the interval to the standard measurement rate for
 that sensor (usually 1000 for once a second).
-7. Make sure you include the logging headers [Here](https://github.com/fabiorenesas/QCS_Silicon_Partners/blob/feature/sm/applications/ek_ra6m4_generic_uart_baremetal_serial/src/sensor/dummy_sensor.c#L28)
+7. Make sure you include the logging headers:
+![Logging](\images\readme_data\logging.PNG)
 7. Create a new folder on images with your company and sensor name, then add the 3D rendered module image.
 8. Create a new folder on docs with your company and sensor name, then add the module documentation.
 9. Commit your Changes (`git commit -m 'Add a new_module'`)
