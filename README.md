@@ -24,7 +24,7 @@ in the folder src/sensor/xyz. Make sure you add the path to the C compiler inclu
 with two sensors already implemented as examples: HS3001 is Renesas temperature and humidity sensor and dummy is an example of how to interface
 to our I2C FSP driver. Please remove these sensors and drivers for testing your own drivers!
 5. Add the thin-layer source file that implements Renesas' Sensor Manager API. These files shall be named after the new sensor so, for instance,
-if the new sensor is xyz, the thin-layer files shall be named xyz_sensor.c and xyz_sensor.h. These files must be located preferrably
+if the new sensor is xyz, the thin-layer files shall be named **xyz_sensor.c** and **xyz_sensor.h**. These files must be located preferrably
 under src/sensor.
 6. Update the sm_define_sensors.inc to include the type of sensor and unit (DEFINE_SENSOR_TYPE), sensor driver name (this is the thin-layer name
 used for the new sensor, for instance, xyz_sensor) and create new sensor instances, one for each channel on the new sensor (so if for instance
@@ -35,11 +35,16 @@ Set it to zero if the sensor uses its own internal state machine for sequencing,
 that sensor (usually 1000 for once a second).
 7. Make sure you include the logging headers:
 ![Logging](/images/readme_data/logging.PNG)
-7. Create a new folder on images with your company and sensor name, then add the 3D rendered module image.
-8. Create a new folder on docs with your company and sensor name, then add the module documentation.
-9. Commit your Changes (`git commit -m 'Add a new_module'`)
-10. Push to the Branch (`git push origin feature/new_module`)
-11. Create a pull request to the QCS_Silicon Partner repository
+For local-only logging, comment out the **include "log_disabled.h"** and uncomment the desired logging level. For global logging control please
+update the GLOBAL_LOGGING_LEVEL defined in the **global_logging_definitions.h** file under src/qc-middleware/common_utils. When defined, that
+symbol overrides any local logging setting!
+8. DO NOT modify any files inside qc-middleware or any of the main application files (hal_entry.c, main_application.*, uart.*) if for some reason
+your code requires changing any of those files, contact the Renesas team and make sure your PR clarifies why that is needed.
+9. Create a new folder on images with your company and sensor name, then add the 3D rendered module image.
+10. Create a new folder on docs with your company and sensor name, then add the module documentation.
+11. Commit your Changes (`git commit -m 'Add a new_module'`)
+12. Push to the Branch (`git push origin feature/new_module`)
+13. Create a pull request to the QCS_Silicon Partner repository
 
 ## References
 1. EK-RA6M4: https://www.renesas.com/us/en/products/microcontrollers-microprocessors/ra-cortex-m-mcus/ek-ra6m4-evaluation-kit-ra6m4-mcu-group
