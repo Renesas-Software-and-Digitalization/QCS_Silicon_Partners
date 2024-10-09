@@ -1,0 +1,39 @@
+ek_ra6m4_hs3001_da14531_baremetal_custom_profile:
+  mcu_kits: ek_ra6m4
+  os: baremetal
+  pmods:
+  - hs3001
+  - da14531
+  application: custom_profile
+
+ek_ra6m4_hs3001_da14531_freertos_custom_profile:
+  mcu_kits: ek_ra6m4
+  os: freertos
+  pmods:
+  - hs3001
+  - da14531
+  application: custom_profile
+
+ek_ra2e1_hs3001_da16200_freertos_aws_mqtt_onchip:
+  mcu_kits: ek_ra2e1
+  os: freertos
+  pmods:
+  - hs3001
+  - da16200
+  application: aws_mqtt_onchip
+
+ek_ra4m2_hs4001_da16600_freertos_adafruit:
+  mcu_kits: ek_ra4m2
+  os: freertos
+  pmods:
+  - hs4001
+  - da16600
+  application: adafruit_cloud
+
+ek_ra8m1_fs3000_da16200_freertos_aws_coremqtt:
+  mcu_kits: ek_ra8m1
+  os: freertos
+  pmods:
+  - fs3000
+  - da16200
+  application: aws_coremqtt
